@@ -1,1 +1,1 @@
-# food-picker
+# food-dice
