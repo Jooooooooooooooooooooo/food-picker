@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>今天吃什麼？(功能升級版)</title>
+    <title>今天吃什麼？(功能特仕版)</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; text-align: center; background-color: #f9f9f9; color: #333; }
-        h1 { color: #2c3e50; margin-top: 30px; font-size: 24px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; text-align: center; background-color: #f4f6f8; color: #333; }
+        h1 { color: #2c3e50; margin-top: 20px; font-size: 24px; }
         .control-panel { margin: 20px 0; padding: 20px; border: 1px solid #e0e0e0; border-radius: 12px; background-color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: left; }
-        .input-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
+        .input-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
         label { font-weight: bold; font-size: 14px; color: #34495e; }
-        input[type="text"], input[type="number"] { padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        input[type="text"] { width: 100%; }
-        input[type="number"] { width: 100px; }
+        input[type="text"], input[type="number"], select { padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; width: 100%; }
+        
+        /* 類型勾選區樣式 */
+        .cuisine-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px; }
+        .cuisine-item { font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+
         button { width: 100%; padding: 12px; font-size: 18px; font-weight: bold; cursor: pointer; color: white; border: none; border-radius: 8px; transition: background 0.2s; margin-top: 10px; }
         #fetchBtn { background-color: #3498db; }
         #fetchBtn:hover { background-color: #2980b9; }
@@ -20,17 +23,13 @@
         #rollBtn:hover { background-color: #27ae60; }
         button:disabled { background-color: #bdc3c7 !important; cursor: not-allowed; }
         
-        /* 結果卡片樣式優化 */
         #result { margin-top: 25px; padding: 20px; border: 2px dashed #2ecc71; border-radius: 12px; background-color: #f2f9f5; display: none; text-align: left; }
         #result h2 { margin-top: 0; color: #27ae60; font-size: 22px; }
         .menu-link { display: inline-block; margin: 10px 0; padding: 8px 15px; background-color: #e67e22; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; }
-        .menu-link:hover { background-color: #d35400; }
         
-        /* 評論區塊樣式 */
         .reviews-section { margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px; }
         .reviews-title { font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 15px; }
-        .review-box { background: white; padding: 10px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #eee; font-size: 13px; color: #555; line-height: 1.4; }
-        .review-stars { color: #f1c40f; font-weight: bold; }
+        .review-box { background: white; padding: 10px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #eee; font-size: 13px; color: #555; }
         
         .blacklist-btn { background-color: #e74c3c; font-size: 14px; padding: 8px; margin-top: 15px; }
         #statusMsg { font-size: 14px; color: #7f8c8d; margin-top: 8px; text-align: center; font-weight: bold; }
@@ -38,22 +37,44 @@
 </head>
 <body>
 
-    <h1>🍔 今天吃什麼？(功能升級版)</h1>
+    <h1>🍔 今天吃什麼？(功能特仕版)</h1>
 
     <div class="control-panel">
         <div class="input-group">
-            <label for="locationInput">中心位置 (輸入地址、路段或地標)：</label>
-            <input type="text" id="locationInput" value="新北市板橋區府中路" placeholder="例如：台北火車站、信義區松智路...">
+            <label for="locationInput">中心位置 (輸入地址或地標)：</label>
+            <input type="text" id="locationInput" value="新北市板橋區府中路" placeholder="例如：台北火車站...">
         </div>
         
-        <div class="input-group" style="flex-direction: row; align-items: center; gap: 10px;">
-            <label for="radius">搜尋範圍：</label>
+        <div class="input-group">
+            <label for="radius">搜尋範圍 (公尺)：</label>
             <input type="number" id="radius" value="1000" min="100" max="5000" step="100">
-            <span>公尺</span>
+        </div>
+
+        <div class="input-group">
+            <label for="priceSelect">預算設定 (人均)：</label>
+            <select id="priceSelect">
+                <option value="ALL">不限金額 💰</option>
+                <option value="PRICE_LEVEL_INEXPENSIVE">$200 以下 🪙</option>
+                <option value="PRICE_LEVEL_MODERATE">$200 - $500 💵</option>
+                <option value="PRICE_LEVEL_EXPENSIVE">$500 - $1000 💳</option>
+                <option value="PRICE_LEVEL_VERY_EXPENSIVE">$1000 以上 💎</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>想吃什麼類型？(可多選，全不勾代表皆可)</label>
+            <div class="cuisine-group">
+                <label class="cuisine-item"><input type="checkbox" name="cuisine" value="thai_restaurant"> 泰式</label>
+                <label class="cuisine-item"><input type="checkbox" name="cuisine" value="italian_restaurant"> 義式</label>
+                <label class="cuisine-item"><input type="checkbox" name="cuisine" value="japanese_restaurant"> 日式/拉麵</label>
+                <label class="cuisine-item"><input type="checkbox" name="cuisine" value="chinese_restaurant"> 中式/港式</label>
+                <label class="cuisine-item"><input type="checkbox" name="cuisine" value="american_restaurant"> 美式/漢堡</label>
+                <label class="cuisine-item"><input type="checkbox" name="cuisine" value="korean_restaurant"> 韓式</label>
+            </div>
         </div>
         
-        <button id="fetchBtn" onclick="searchStores()">1. 搜尋附近小吃</button>
-        <p id="statusMsg">請輸入地點並點擊搜尋</p>
+        <button id="fetchBtn" onclick="searchStores()">1. 搜尋符合條件餐廳</button>
+        <p id="statusMsg">請設定條件並點擊搜尋</p>
     </div>
 
     <div>
@@ -69,8 +90,7 @@
 
         <div class="reviews-section">
             <div class="reviews-title">💬 精選熱門評價：</div>
-            <div id="reviewsContainer">
-                </div>
+            <div id="reviewsContainer"></div>
         </div>
 
         <button class="blacklist-btn" onclick="addToBlacklist()">❌ 難吃！永久加入黑名單</button>
@@ -86,6 +106,7 @@
 
         async function searchStores() {
             const locationText = document.getElementById('locationInput').value.trim();
+            const priceSelect = document.getElementById('priceSelect').value;
             const fetchBtn = document.getElementById('fetchBtn');
             const statusMsg = document.getElementById('statusMsg');
 
@@ -98,20 +119,27 @@
             fetchBtn.disabled = true;
             statusMsg.innerText = "正在撈取資料中...";
 
+            // 處理預算參數：如果不是選 ALL，就加入 API 請求條件中
+            const requestBody = {
+                textQuery: `${locationText} 餐廳`, 
+                maxResultCount: 20,
+                languageCode: "zh-TW"
+            };
+
+            if (priceSelect !== "ALL") {
+                requestBody.priceLevels = [priceSelect];
+            }
+
             try {
                 const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Goog-Api-Key': API_KEY,
-                        // 關鍵調整：加入了 places.googleMapsUri 以及 places.reviews 欄位
-                        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.googleMapsUri,places.reviews'
+                        // 關鍵調整：加入了 places.types 欄位，用來辨識餐廳料理類型
+                        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.googleMapsUri,places.reviews,places.types'
                     },
-                    body: JSON.stringify({
-                        textQuery: `${locationText} 餐廳`, 
-                        maxResultCount: 20,
-                        languageCode: "zh-TW"
-                    })
+                    body: JSON.stringify(requestBody)
                 });
 
                 const data = await response.json();
@@ -119,10 +147,12 @@
                 if (data.places && data.places.length > 0) {
                     allStores = data.places;
                     document.getElementById('rollBtn').disabled = false;
-                    statusMsg.innerText = `成功找到 ${allStores.length} 間鄰近餐廳！`;
+                    statusMsg.innerText = `成功找到 ${allStores.length} 間符合預算的餐廳！`;
                     statusMsg.style.color = '#27ae60';
                 } else {
-                    statusMsg.innerText = "找不到任何餐廳，請嘗試更換地點關鍵字。";
+                    allStores = [];
+                    document.getElementById('rollBtn').disabled = true;
+                    statusMsg.innerText = "找不到符合預算的餐廳，請調整預算或地點。";
                     statusMsg.style.color = '#e74c3c';
                 }
             } catch (error) {
@@ -130,29 +160,43 @@
                 statusMsg.innerText = "搜尋失敗，請檢查 API 金鑰。";
                 statusMsg.style.color = '#e74c3c';
             } finally {
-                fetchBtn.innerText = "1. 搜尋附近小吃";
+                fetchBtn.innerText = "1. 搜尋符合條件餐廳";
                 fetchBtn.disabled = false;
             }
         }
 
         function pickRandomStore() {
             const blacklist = JSON.parse(localStorage.getItem('food_blacklist')) || [];
-            const availableStores = allStores.filter(store => !blacklist.includes(store.id));
+            
+            // 獲取使用者勾選的料理類型
+            const checkedCuisines = Array.from(document.querySelectorAll('input[name="cuisine"]:checked')).map(cb => cb.value);
+
+            // 進行過濾：1. 排除黑名單 2. 如果有勾選類型，必須符合該類型
+            const availableStores = allStores.filter(store => {
+                const isBlacklisted = blacklist.includes(store.id);
+                
+                if (isBlacklisted) return false;
+                
+                // 如果沒有勾選任何類型，只要不是黑名單都可以
+                if (checkedCuisines.length === 0) return true;
+                
+                // 檢查餐廳的類型（store.types）與勾選的類型有沒有交集
+                return store.types && store.types.some(type => checkedCuisines.includes(type));
+            });
 
             if (availableStores.length === 0) {
-                alert("這個範圍的店都被你加進黑名單了啦！😅");
+                alert("找不到符合你「勾選種類」的餐廳（或者都被你黑名單了）😅 請多勾選幾種試試看！");
                 return;
             }
 
             const randomIndex = Math.floor(Math.random() * availableStores.length);
             currentStore = availableStores[randomIndex];
 
-            // 渲染基本資料
+            // 渲染介面
             document.getElementById('storeName').innerText = currentStore.displayName.text;
             document.getElementById('storeRating').innerText = `評價：${currentStore.rating ? currentStore.rating + ' ⭐' : '暫無評價'}`;
             document.getElementById('storeAddress').innerText = `地址：${currentStore.formattedAddress}`;
             
-            // 填入 Google 地圖連結
             const mapLink = document.getElementById('storeMapUri');
             if (currentStore.googleMapsUri) {
                 mapLink.href = currentStore.googleMapsUri;
@@ -161,35 +205,26 @@
                 mapLink.style.display = 'none';
             }
 
-            // 處理並渲染前兩則評價
             const reviewsContainer = document.getElementById('reviewsContainer');
-            reviewsContainer.innerHTML = ''; // 先清空舊評論
+            reviewsContainer.innerHTML = '';
 
             if (currentStore.reviews && currentStore.reviews.length > 0) {
-                // 只取前兩則
                 const topReviews = currentStore.reviews.slice(0, 2);
-                
                 topReviews.forEach(review => {
                     const reviewBox = document.createElement('div');
                     reviewBox.className = 'review-box';
-                    
-                    // 建立星等顯示
                     const stars = '⭐'.repeat(review.rating || 0);
-                    
-                    // 擷取部分文字防止太長，如果評論太長就切斷
-                    let reviewText = review.text?.text || '（僅評分，無文字評論）';
-                    if (reviewText.length > 80) {
-                        reviewText = reviewText.substring(0, 80) + '...';
-                    }
+                    let reviewText = review.text?.text || '（僅評分）';
+                    if (reviewText.length > 80) reviewText = reviewText.substring(0, 80) + '...';
 
                     reviewBox.innerHTML = `
-                        <div><span class="review-stars">${stars}</span> <strong>${review.authorAttribution?.displayName || '匿名用戶'}</strong></div>
-                        <div style="margin-top:5px; color:#666;">"${reviewText}"</div>
+                        <div><span style="color:#f1c40f;">${stars}</span> <strong>${review.authorAttribution?.displayName || '用戶'}</strong></div>
+                        <div style="margin-top:5px; color:#666; font-size:13px;">"${reviewText}"</div>
                     `;
                     reviewsContainer.appendChild(reviewBox);
                 });
             } else {
-                reviewsContainer.innerHTML = '<div style="color:#999; font-size:13px;">暫無詳細評論資料。</div>';
+                reviewsContainer.innerHTML = '<div style="color:#999; font-size:13px;">暫無評論資料。</div>';
             }
 
             document.getElementById('result').style.display = 'block';
@@ -197,13 +232,11 @@
 
         function addToBlacklist() {
             if (!currentStore) return;
-
             let blacklist = JSON.parse(localStorage.getItem('food_blacklist')) || [];
             if (!blacklist.includes(currentStore.id)) {
                 blacklist.push(currentStore.id);
                 localStorage.setItem('food_blacklist', JSON.stringify(blacklist));
                 alert(`已將「${currentStore.displayName.text}」加入黑名單！`);
-                
                 pickRandomStore();
             }
         }
